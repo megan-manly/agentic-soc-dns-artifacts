@@ -1,0 +1,45 @@
+LLM Analyze DNS Batch Node
+
+Method: POST
+URL: http://ollama:11434/api/chat
+Authentication: None
+
+Send Headers: ON
+Specify Headers: Using Fields Below
+Name: Content-Type
+Value: application/json
+
+Send Body: ON
+Body Content Type: JSON
+Specify Body: Using JSON
+JSON:
+{
+  "model": "llama3.1:8b-instruct-q4_K_M",
+  "stream": false,
+  "format": "json",
+  "options": {
+    "temperature": 0,
+    "top_p": 0.1,
+    "repeat_penalty": 1.2,
+    "num_ctx": 4096,
+    "num_predict": 120
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a SOC analyst specializing in DNS-based threat detection using aggregated DNS feature records (DNS meta-data + flow statistics).\n\nYour task: classify ONE record as either malicious or benign. You MUST choose one of these two labels.\n\nIMPORTANT: You MUST echo the run_id and doc_id EXACTLY as provided in the user message.\n\nReturn ONLY valid JSON with EXACTLY these keys:\n{\"run_id\":\"string\",\"doc_id\":\"string\",\"llm_label\":\"malicious|benign\",\"confidence\":0.0,\"reason\":\"string\"}\n\nSTRICT RULES:\n- Output ONLY one JSON object with the exact keys above. No extra keys. No markdown.\n- You MUST copy run_id and doc_id exactly from the user message.\n- confidence must be 0.0–1.0.\n- reason must be EXACTLY 1 sentence, <= 180 characters, must NOT be empty, and MUST include at least TWO explicit field=value references from the record.\n- If evidence is weak or ambiguous, you must still choose a label. In that case choose \"benign\" unless there are clear suspicious signals.\n\nFIELD GUIDE:\nA) DNS response / TTL / RR\n- ans_resource_record_type, ans_resource_record_class\n- average_additional_resource_records, average_authority_resource_records\n- ttl_values_coefficient_of_variation, ttl_values_skewness\n\nB) Flow size / rate / packet-length shape\n- sending_bytes, receiving_bytes\n- sending_packets_rate, receiving_packets_rate, packets_len_rate\n- mean_packets_len, standard_deviation_packets_len, coefficient_of_variation_packets_len\n- mean_sending_packets_len\n- duration\n\nC) Domain lexical\n- dns_top_level_domain\n- dns_domain_name_length\n- character_entropy\n- vowels_consonant_ratio\n\nD) Timing jitter\n- mean_sending_packets_delta_time\n\nDECISION HEURISTICS:\n- Malicious if multiple suspicious indicators align (lexical randomness, abnormal rates/sizes, TTL instability).\n- Benign if behavior matches normal DNS or evidence is weak."
+    },
+    {
+      "role": "user",
+      "content": "doc_id: {{$json.doc_id}}\nrun_id: {{$json.run_id}}\n\nKey fields:\n- protocol={{$json.llm_input.protocol}}\n- src_ip={{$json.llm_input.src_ip}}\n- dns_top_level_domain={{$json.llm_input.dns_top_level_domain}}\n\nDNS response / TTL / RR:\n- ans_resource_record_type={{$json.llm_input.ans_resource_record_type}}\n- ans_resource_record_class={{$json.llm_input.ans_resource_record_class}}\n- average_additional_resource_records={{$json.llm_input.average_additional_resource_records}}\n- average_authority_resource_records={{$json.llm_input.average_authority_resource_records}}\n- ttl_values_coefficient_of_variation={{$json.llm_input.ttl_values_coefficient_of_variation}}\n- ttl_values_skewness={{$json.llm_input.ttl_values_skewness}}\n\nFlow size / rates / packet-length shape:\n- sending_bytes={{$json.llm_input.sending_bytes}} receiving_bytes={{$json.llm_input.receiving_bytes}}\n- sending_packets_rate={{$json.llm_input.sending_packets_rate}} receiving_packets_rate={{$json.llm_input.receiving_packets_rate}}\n- packets_len_rate={{$json.llm_input.packets_len_rate}}\n- duration={{$json.llm_input.duration}}\n- mean_packets_len={{$json.llm_input.mean_packets_len}} standard_deviation_packets_len={{$json.llm_input.standard_deviation_packets_len}} coefficient_of_variation_packets_len={{$json.llm_input.coefficient_of_variation_packets_len}}\n- mean_sending_packets_len={{$json.llm_input.mean_sending_packets_len}}\n\nTiming jitter:\n- mean_sending_packets_delta_time={{$json.llm_input.mean_sending_packets_delta_time}}\n\nDomain lexical:\n- dns_domain_name_length={{$json.llm_input.dns_domain_name_length}}\n- character_entropy={{$json.llm_input.character_entropy}}\n- vowels_consonant_ratio={{$json.llm_input.vowels_consonant_ratio}}"
+    }
+  ]
+}
+
+Options--
+Batching: 
+Items per Batch: 1
+Batch Interval (ms): 1500
+Ignore SSL Issues (Insecure): ON
+
+Timeout: 9000000

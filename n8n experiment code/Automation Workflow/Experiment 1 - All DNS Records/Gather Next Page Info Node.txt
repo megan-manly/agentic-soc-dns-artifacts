@@ -1,0 +1,8 @@
+Gather Next Page Info Node
+Node Type: Merge
+
+Mode: Choose Branch
+Number of Inputs: 2
+Output Type: Wait for All Inputs to Arrive
+Output: Data of Specified Input
+Use Data of Input: 1

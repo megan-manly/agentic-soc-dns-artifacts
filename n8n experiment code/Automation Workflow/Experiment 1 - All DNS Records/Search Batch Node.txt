@@ -1,0 +1,25 @@
+Search Batch Node
+
+Method: POST
+URL: http://elasticsearch:9200/_search
+Authentication: Generic Credential Type
+Generic Auth Type: Basic Auth
+Basic Auth: Elastic Credential
+Send Headers: On
+Specify Headers: Using Fields Below
+Name: Content-Type
+Value: application/json
+
+Send Body: On
+Body Content Type: Raw
+Content Type: application/json
+
+{
+  "size": 100,
+  "pit": {
+    "id": "{{$node['Open PIT'].json['id']}}",
+    "keep_alive": "24h"
+  },
+  "sort": [{ "_shard_doc": "asc" }],
+  "_source": true
+}

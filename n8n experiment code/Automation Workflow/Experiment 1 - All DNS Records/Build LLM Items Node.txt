@@ -1,0 +1,63 @@
+Build LLM Items Node
+
+Mode: Run Once for All Items
+Language: JavaScript
+
+JavaScript:
+// Build LLM Items from Prep Next Page output
+// Input: { pit_id, docs: [ES hits], has_more, next_search_after, count }
+// Output: one item per hit with run_id + doc_id + llm_input + cursor fields
+
+const hits = $json.docs ?? [];              // <-- key change
+const RUN_ID = $json.run_id ?? new Date().toISOString();
+
+// Cursor fields come from Prep Next Page
+const pit_id = $json.pit_id ?? null;
+const search_after = $json.next_search_after ?? null;   // already an array
+const hits_count = Number($json.count ?? hits.length);
+
+// Utility: deep clone to avoid mutation issues
+function deepClone(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+const out = hits.map((hit) => {
+  const src = hit._source || {};
+
+  // Clone ALL extracted fields
+  const llm_input = deepClone(src);
+
+  // Remove label leakage fields
+  delete llm_input.is_malicious;
+  delete llm_input.label;
+  delete llm_input.label_family;
+  delete llm_input.log;
+  delete llm_input.host;
+
+  // Remove duplicate/raw text fields we don't want
+  delete llm_input.message;
+  if (llm_input.event && typeof llm_input.event === "object") {
+    delete llm_input.event.original;
+    if (Object.keys(llm_input.event).length === 0) delete llm_input.event;
+  }
+
+  // Add minimal ES metadata (helpful for debugging/rejoin)
+  llm_input._index = hit._index;
+  llm_input._id = hit._id;
+
+  return {
+    json: {
+      // per-record fields
+      run_id: RUN_ID,
+      doc_id: hit._id,
+      llm_input,
+
+      // cursor fields (available to downstream, esp. after split done)
+      pit_id,
+      next_search_after: search_after,
+      hits_count
+    }
+  };
+});
+
+return out;

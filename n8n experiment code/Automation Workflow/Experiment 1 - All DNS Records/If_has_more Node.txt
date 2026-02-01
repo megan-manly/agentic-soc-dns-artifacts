@@ -1,0 +1,5 @@
+If_has_more node
+Node Type: IF
+
+Conditions:
+{{ $json.has_more }} is true

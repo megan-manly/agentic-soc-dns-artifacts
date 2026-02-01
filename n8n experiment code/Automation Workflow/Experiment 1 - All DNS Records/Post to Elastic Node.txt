@@ -1,0 +1,29 @@
+Post to Elastic Node
+Node Type: HTTP Node
+
+Method: POST
+URL: http://elasticsearch:9200/llm-dns-results/_update/{{$json.doc_id}}
+Authentication: Generic Credential Type
+Generic Auth Type: Basic Auth
+Basic Auth: Elastic Credential
+
+Send Headers: ON
+Specify Headers: Using Fields Below
+Name: Content-Type
+Value: application/json
+
+Send Body: ON
+Body Content Type: Raw
+Content Type: application/json 
+
+Body:
+{
+  "doc": {
+    "doc_id": "{{$json.doc_id}}",
+    "llm_label": "{{$json.llm_label}}",
+    "confidence": {{$json.confidence}},
+    "reason": "{{$json.reason}}",
+    "@timestamp": "{{$now}}"
+  },
+  "doc_as_upsert": true
+}
