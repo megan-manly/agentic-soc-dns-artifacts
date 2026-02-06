@@ -1,7 +1,0 @@
-Edit Fields Node
-
-Mode: JSON
-
-{
-  "run_id": "{{$now}}"
-}
