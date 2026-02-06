@@ -5,11 +5,12 @@ This artifact provides the containerized environment used to evaluate the LLM-as
 ## Artifact Contents
 
 The ZIP archive includes:
-- Preconfigured Docker compose configurations for the full security stack
-- Startup and tear-down scripts for Windows, macOS, and Linux
-- Experiment configuration files (LLM prompts, schemas, and workflow definitions)
-- A subset of the DNS dataset required for complete replication of the reported experiments
-- The setup guide: System_Requirements_and_Setup.pdf
+
+* Preconfigured Docker compose configurations for the full security stack
+* Startup and tear-down scripts for Windows, macOS, and Linux
+* Experiment configuration files (LLM prompts, schemas, and workflow definitions)
+* A subset of the DNS dataset required for complete replication of the reported experiments
+* The setup guide: System\_Requirements\_and\_Setup.pdf
 
 ## Getting Started
 
@@ -18,6 +19,7 @@ The ZIP archive includes:
 3. Open the extracted folder.
 4. Follow the setup and execution instructions in:
 
-   System_Requirements_and_Setup.pdf
+   System\_Requirements\_and\_Setup.pdf
 
-For full reproduction of the experiments, follow the instructions in the included PDF exactly as written.
+   For full reproduction of the experiments, follow the instructions in the included PDF.
+
